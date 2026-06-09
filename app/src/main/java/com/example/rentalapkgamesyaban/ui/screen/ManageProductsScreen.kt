@@ -17,13 +17,13 @@ import com.example.rentalapkgamesyaban.ui.viewmodel.ProductViewModel
 @Composable
 fun ManageProductsScreen(
     productViewModel: ProductViewModel,
-    onNavigateToAddProduct: () -> Unit
+    onNavigateToAddProduct: (Int?) -> Unit
 ) {
     val products by productViewModel.products.collectAsState()
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = onNavigateToAddProduct) {
+            FloatingActionButton(onClick = { onNavigateToAddProduct(null) }) {
                 Icon(Icons.Default.Add, contentDescription = "Add Product")
             }
         }
@@ -37,7 +37,7 @@ fun ManageProductsScreen(
                     ProductCard(
                         product = product,
                         onClick = { /* Nothing for now */ },
-                        onEdit = { /* Navigate to Edit, skipped for brevity but supported */ },
+                        onEdit = { onNavigateToAddProduct(product.id) },
                         onDelete = { productViewModel.deleteProduct(product) }
                     )
                 }

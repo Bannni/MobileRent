@@ -8,6 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
 import com.example.rentalapkgamesyaban.ui.components.BottomNavBar
 import com.example.rentalapkgamesyaban.ui.screen.*
 import com.example.rentalapkgamesyaban.ui.viewmodel.AuthViewModel
@@ -37,6 +39,26 @@ fun NavGraph(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
+            if (showBottomBar && currentUser != null) {
+                TopAppBar(
+                    title = { Text("RentSphere") },
+                    actions = {
+                        TextButton(onClick = {
+                            authViewModel.logout()
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }) {
+                            Text("Logout", color = MaterialTheme.colorScheme.error)
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                )
+            }
+        },
         bottomBar = {
             if (showBottomBar && currentUser != null) {
                 BottomNavBar(
@@ -106,12 +128,25 @@ fun NavGraph(
             composable(Screen.ManageProducts.route) {
                 ManageProductsScreen(
                     productViewModel = productViewModel,
-                    onNavigateToAddProduct = { navController.navigate(Screen.AddEditProduct.route) }
+                    onNavigateToAddProduct = { productId -> 
+                        val route = if (productId != null) "${Screen.AddEditProduct.route}?productId=$productId" else Screen.AddEditProduct.route
+                        navController.navigate(route) 
+                    }
                 )
             }
-            composable(Screen.AddEditProduct.route) {
+            composable(
+                route = "${Screen.AddEditProduct.route}?productId={productId}",
+                arguments = listOf(navArgument("productId") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                })
+            ) { backStackEntry ->
+                val productIdArg = backStackEntry.arguments?.getInt("productId") ?: -1
+                val productId = if (productIdArg == -1) null else productIdArg
+                
                 AddEditProductScreen(
                     productViewModel = productViewModel,
+                    productId = productId,
                     onNavigateBack = { navController.navigateUp() }
                 )
             }

@@ -32,6 +32,14 @@ fun ProductCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            if (product.imageUri.isNotBlank()) {
+                coil.compose.AsyncImage(
+                    model = product.imageUri,
+                    contentDescription = product.name,
+                    modifier = Modifier.fillMaxWidth().height(150.dp).padding(bottom = 8.dp),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                )
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
